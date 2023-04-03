@@ -70,8 +70,13 @@ model = tf.keras.Sequential([
 # callbacks = [EarlyStopping(monitor='val_accuracy', patience=3)]
 # Start the training
 model.compile(optimizer='adam', loss=tf.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
+
 # Store the results
 history = model.fit(train_ds, validation_data=val_ds, epochs=125)
+
+# Save the model
+model.save('saved_model/my_model')
+
 # The various types of results
 y_vloss = history.history['val_loss']
 y_loss = history.history['loss']
