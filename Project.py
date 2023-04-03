@@ -20,15 +20,17 @@ l1.grid(row=1, column=1, columnspan=4)
 
 # The upload button
 uploadButton = Button(win, text='Upload File', width=20, command=lambda: upload_file())
-uploadButton.grid(row=2, column=1)
+uploadButton.grid(row=3, column=1)
+
+# The Predict button
+predictButton = Button(win, text='Do I need to Mow?', width=20, command=lambda: predict())
+predictButton.grid(row=4, column=1)
 
 
 def upload_file():
     global picture
     f_types = [('PNG Files', '*.png')]
     filename = filedialog.askopenfilename(filetypes=f_types)
-    img = Image.open(filename)
-    picture = img.resize((256, 256))  # new width & height
     picture = ImageTk.PhotoImage(file=filename)  # Can be changed with resized image (filename)
     b2 = Button(win, image=picture)  # using Button
     b2.grid(row=3, column=1)
@@ -36,7 +38,7 @@ def upload_file():
 
 def predict():
     # Data location
-    data_dir = "C:\Users\Andre\OneDrive\Pictures\lawns"
+    data_dir = 'Lawns/'
     # Setting up the paths for data or something... not sure.
     data_dir = pathlib.Path(data_dir)
     # Training data
