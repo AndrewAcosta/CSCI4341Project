@@ -26,6 +26,7 @@ l1.grid(row=1, column=1, columnspan=4)
 # Write the path - Option 2
 # path = Entry(win)
 # path.grid(row=5, column=2)
+
 # Choose a png - Option 1
 getFilepathButton = Button(win, text='Choose image', width=20, command=lambda: open_file())
 getFilepathButton.grid(row=2, column=1)
@@ -41,7 +42,7 @@ result.grid(row=5, column=1)
 
 
 def open_file():
-    file = filedialog.askopenfile(mode='r', filetypes=[('PNG Files', '*.png')])
+    file = filedialog.askopenfile(mode='r', filetypes=[('image files', ('.png', '.jpg'))])
     if file:
         filepath = os.path.abspath(file.name)
         label.configure(text=f"{str(filepath)}")

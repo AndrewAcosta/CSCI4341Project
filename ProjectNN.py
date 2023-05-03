@@ -1,14 +1,16 @@
 import pathlib
 import numpy as np
 import tensorflow as tf
+from keras.callbacks import EarlyStopping
 from keras.layers import Dense, Flatten, Conv2D, MaxPooling2D, Dropout
+from numpy import random
 import matplotlib.pyplot as plt
 import os
 
 # Allow our system to store the data properly
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Need this to run correctly. Otherwise, it will have overflow problems.
 # Data location
-data_dir = 'C:\Users\Andre\OneDrive\Pictures\lawns'
+data_dir = 'Lawns/'
 # Setting up the paths for data or something... not sure.
 data_dir = pathlib.Path(data_dir)
 # Training data
@@ -16,66 +18,48 @@ train_ds = tf.keras.preprocessing.image_dataset_from_directory(
     data_dir,
     validation_split=0.2,
     subset="training",
-    seed=123,
+    seed=random.randint(100),
     image_size=(256, 256),
-    batch_size=50)
+    batch_size=64)
 # Validation Data
 val_ds = tf.keras.preprocessing.image_dataset_from_directory(
     data_dir,
     validation_split=0.2,
     subset="validation",
-    seed=123,
+    seed=random.randint(100),
     image_size=(256, 256),
     batch_size=64)
-
 # Print the different folder names that contain data
 class_names = train_ds.class_names
 print(class_names)
 
+# Buffering the data... maybe?
 AUTOTUNE = tf.data.experimental.AUTOTUNE
 train_ds = train_ds.cache().prefetch(buffer_size=AUTOTUNE)
 val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
-
 # The NN Note: Maybe having .02 dropout is still too much. May try .01 or .02... I could be wrong... So, yeah. This
 # is troublesome
 model = tf.keras.Sequential([
     tf.keras.layers.Rescaling(1. / 255),
     Conv2D(64, 3, padding='same', activation='relu'),
     MaxPooling2D(),
-    Dropout(0.15),
-    Conv2D(64, 3, padding='same', activation='relu'),
-    MaxPooling2D(),
-    Dropout(0.15),
-    Conv2D(64, 3, padding='same', activation='relu'),
-    MaxPooling2D(),
-    Dropout(0.15),
-    Conv2D(64, 3, padding='same', activation='relu'),
-    MaxPooling2D(),
-    Dropout(0.15),
+    Dropout(0.1),
     Conv2D(32, 3, padding='same', activation='relu'),
     MaxPooling2D(),
-    Dropout(0.15),
-    Conv2D(32, 3, padding='same', activation='relu'),
-    MaxPooling2D(),
-    Dropout(0.15),
-    Conv2D(32, 3, padding='same', activation='relu'),
-    MaxPooling2D(),
-    Dropout(0.15),
+    Dropout(0.1),
     Flatten(),
-    Dense(64, activation='relu'),
     Dense(32, activation='relu'),
     Dense(16, activation='relu'),
-    Dense(2)  # Number of classes
+    Dense(3)  # Number of classes
 ])
 # callbacks = [EarlyStopping(monitor='val_accuracy', patience=3)]
 # Start the training
-model.compile(optimizer='adam', loss=tf.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
-
+model.compile(optimizer='adam', loss=tf.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])   # Save model
 # Store the results
-history = model.fit(train_ds, validation_data=val_ds, epochs=125)
+history = model.fit(train_ds, validation_data=val_ds, epochs=1000)
 
-# Save the model
-model.save('saved_model/my_model')
+model.save('savedModels/my_model')
+# new_model = tf.keras.models.load_model('saved_model/my_model')
 
 # The various types of results
 y_vloss = history.history['val_loss']
@@ -95,3 +79,5 @@ ax2.grid()
 plt.setp(ax2, xlabel='epoch', ylabel='accuracy')
 # Show Plot
 plt.show()
+plt.savefig('mower.png')
+
